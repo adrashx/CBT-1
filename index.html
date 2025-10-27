@@ -39,44 +39,12 @@
             max-width: 100%;
             height: auto;
         }
-        
-        .download-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #000;
-            color: #FFD700;
-            padding: 12px 24px;
-            border: 2px solid #FFD700;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            font-family: Arial, sans-serif;
-            cursor: pointer;
-            text-decoration: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s;
-            z-index: 1000;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .download-button:hover {
-            background-color: #FFD700;
-            color: #000;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
-        }
     </style>
 </head>
 <body>
     <div id="pdfContainer">
         <div class="loading">Loading PDF...</div>
     </div>
-    
-    <a href="download.pdf" class="download-button" download>
-        Download PDF
-    </a>
 
     <script>
         // Set up PDF.js worker
@@ -110,8 +78,18 @@
                     const scale = calculateScale(page);
                     const viewport = page.getViewport({scale: scale});
                     
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
+                    // Set canvas dimensions with device pixel ratio for crisp rendering
+                    const devicePixelRatio = window.devicePixelRatio || 1;
+                    const scaledWidth = viewport.width * devicePixelRatio;
+                    const scaledHeight = viewport.height * devicePixelRatio;
+                    
+                    canvas.width = scaledWidth;
+                    canvas.height = scaledHeight;
+                    canvas.style.width = viewport.width + 'px';
+                    canvas.style.height = viewport.height + 'px';
+                    
+                    // Scale the context for high DPI displays
+                    context.scale(devicePixelRatio, devicePixelRatio);
                     
                     const renderContext = {
                         canvasContext: context,
@@ -129,9 +107,8 @@
         
         // Handle window resize
         window.addEventListener('resize', function() {
-            // Reload the PDF when window is resized
-            location.reload();
+            // Remove automatic reload on resize
         });
     </script>
 </body>
-</html> 
+</html>
